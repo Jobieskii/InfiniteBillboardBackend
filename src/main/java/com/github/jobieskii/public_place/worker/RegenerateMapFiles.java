@@ -5,14 +5,14 @@ import com.github.jobieskii.public_place.model.Tile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class RegenerateMapFiles {
     static Logger logger = LoggerFactory.getLogger(RegenerateMapFiles.class);
+
+    public static Set<Tile> dirtyTiles = Collections.synchronizedSet(new HashSet<>());
+
 
     public static void RegenerateUpFromTilesList(List<Tile> tiles) {
         Set<Tile> set = tiles.stream()

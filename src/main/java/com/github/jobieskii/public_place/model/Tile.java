@@ -55,4 +55,14 @@ public class Tile {
     public Tile getParent() {
         return parent;
     }
+    public Set<Tile> getChildren() {return children;}
+
+    @Override
+    public String toString() {
+        return "Tile{" +
+                "level=" + level +
+                ", x=" + x +
+                ", y=" + y +
+                '}';
+    }
 }

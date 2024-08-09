@@ -1,9 +1,13 @@
 package com.github.jobieskii.public_place.controller;
 
 import com.github.jobieskii.public_place.file_manager.FileManager;
+import com.github.jobieskii.public_place.file_manager.PatchData;
 import com.github.jobieskii.public_place.model.Tile;
+import com.github.jobieskii.public_place.model.TileStruct;
 import com.github.jobieskii.public_place.repository.TileRepository;
 import com.github.jobieskii.public_place.repository.UpdateRepository;
+import com.github.jobieskii.public_place.worker.TileWorker;
+import org.springframework.data.util.Pair;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -44,7 +48,8 @@ public class TileController {
 
         int x = xPx - xPx % TILE_SIZE;
         int y = yPx - yPx % TILE_SIZE;
-        Set<Point> idxs = new HashSet<>();
+
+        List<Pair<Tile, PatchData>> tobePatched = new ArrayList<>();
 
         int widthSoFar = 0;
         for (int i = xPx / TILE_SIZE; i <= (xPx + width) / TILE_SIZE; i++) {
@@ -71,14 +76,15 @@ public class TileController {
                 Tile t = tileRepository.findFirstByXAndYAndLevel(i, j, 1);
                 if (t == null) {
                     this.ExpandTilesFor(i, j, 3);
+                    t = tileRepository.findFirstByXAndYAndLevel(i, j, 1);
                 }
-                FileManager.patchFile(i, j, image.getSubimage(widthSoFar, heightSoFar, dw, dh), dx, dy);
+                tobePatched.add(Pair.of(t, new PatchData(image.getSubimage(widthSoFar, heightSoFar, dw, dh), dx, dy)));
 
-                idxs.add(new Point(i, j));
                 heightSoFar += dh;
             }
             widthSoFar += dw;
         }
+        tobePatched.forEach(e -> TileWorker.addToPatchQueue(new TileStruct(e.getFirst()), e.getSecond()));
 
         return ResponseEntity.ok().build();
     }
@@ -89,20 +95,21 @@ public class TileController {
         return arr;
     }
 
-    private void ExpandTilesFor(int x, int y, int maxLevel) {
+    private Tile ExpandTilesFor(int x, int y, int maxLevel) {
 
-        ExpandTilesForInner(x, y, maxLevel, 1);
+        return ExpandTilesForInner(x, y, maxLevel, 1);
     }
     private Tile ExpandTilesForInner(int x, int y, int maxLevel, int level) {
         if (level > maxLevel) {return null;}
 
         Tile parrentT = tileRepository.findFirstByXAndYAndLevel(x/2, y/2, level + 1);
         if (parrentT == null) {
-            parrentT = ExpandTilesForInner(x/2, y/2, maxLevel, level+1);
+            ExpandTilesForInner(x/2, y/2, maxLevel, level+1);
+            parrentT = tileRepository.findFirstByXAndYAndLevel(x/2, y/2, level + 1);
         }
         Tile newT = new Tile(x, y, level, parrentT);
-        tileRepository.save(newT);
         FileManager.createFile(level, x, y);
+        tileRepository.save(newT);
         return newT;
     }
 }

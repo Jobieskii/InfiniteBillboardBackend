@@ -1,0 +1,78 @@
+package com.github.jobieskii.public_place.model;
+
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+/*
+This class is used only for calculations, Use Tile whenever persistence to the DB is required
+ */
+public class TileStruct {
+    private int x;
+    private int y;
+    private int level;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TileStruct that = (TileStruct) o;
+        return x == that.x && y == that.y && level == that.level;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y, level);
+    }
+
+    public TileStruct(int x, int y, int level) {
+        this.x = x;
+        this.y = y;
+        this.level = level;
+    }
+    public TileStruct(Tile tile) {
+        this.x = tile.getX();
+        this.y = tile.getY();
+        this.level = tile.getLevel();
+    }
+
+    @Override
+    public String toString() {
+        return "TileStruct{" +
+                "x=" + x +
+                ", y=" + y +
+                ", level=" + level +
+                '}';
+    }
+
+    public TileStruct getParent() {
+        if (level > 2) {
+            return null;
+        }
+        return new TileStruct(this.x / 2, this.y / 2, this.level + 1);
+    }
+    public List<TileStruct> getChildren() {
+        List<TileStruct> children = new ArrayList<>();
+        if (level <= 1) return children;
+        int cx = this.x * 2;
+        int cy = this.y * 2;
+        children.add(new TileStruct(cx, cy, this.level - 1));
+        children.add(new TileStruct(cx, cy + 1, this.level - 1));
+        children.add(new TileStruct(cx + 1, cy, this.level - 1));
+        children.add(new TileStruct(cx + 1, cy + 1, this.level - 1));
+        return children;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+}
