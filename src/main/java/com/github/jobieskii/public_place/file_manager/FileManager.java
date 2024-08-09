@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
 
@@ -24,7 +23,8 @@ public class FileManager {
             try {
                 File parentDir = file.getParentFile();
                 if (!parentDir.exists()) {
-                    parentDir.mkdirs();
+                    boolean b = parentDir.mkdirs();
+                    if (!b) throw new IOException("Unable to create directory " + parentDir);
                 }
                 int width = 512;
                 int height = 512;
@@ -36,7 +36,7 @@ public class FileManager {
 
                 // Write the image to the file
                 ImageIO.write(image, "png", file);
-                logger.info("File created: " + filePath);
+                logger.info("File created: {}", filePath);
             } catch (IOException e) {
                 logger.error(e.getMessage());
             }
@@ -73,7 +73,8 @@ public class FileManager {
 
         File parentDir = file.getParentFile();
         if (!parentDir.exists()) {
-            parentDir.mkdirs();
+            boolean b = parentDir.mkdirs();
+            if (!b) throw new IOException("Unable to create directory " + parentDir);
         }
 
         BufferedImage newImage = new BufferedImage(1024, 1024, BufferedImage.TYPE_INT_RGB);

@@ -1,6 +1,8 @@
 package com.github.jobieskii.public_place.model;
 
 
+import lombok.Getter;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -8,10 +10,11 @@ import java.util.Objects;
 /*
 This class is used only for calculations, Use Tile whenever persistence to the DB is required
  */
+@Getter
 public class TileStruct {
-    private int x;
-    private int y;
-    private int level;
+    private final int x;
+    private final int y;
+    private final int level;
 
     @Override
     public boolean equals(Object o) {
@@ -64,15 +67,4 @@ public class TileStruct {
         return children;
     }
 
-    public int getX() {
-        return x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    public int getLevel() {
-        return level;
-    }
 }

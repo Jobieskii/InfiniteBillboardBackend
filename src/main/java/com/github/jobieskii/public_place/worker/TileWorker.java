@@ -2,15 +2,12 @@ package com.github.jobieskii.public_place.worker;
 
 import com.github.jobieskii.public_place.file_manager.FileManager;
 import com.github.jobieskii.public_place.file_manager.PatchData;
-import com.github.jobieskii.public_place.model.Tile;
 import com.github.jobieskii.public_place.model.TileStruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -32,7 +29,7 @@ public class TileWorker implements Runnable {
     static Logger logger = LoggerFactory.getLogger(TileWorker.class);
     private static final ConcurrentHashMap<TileStruct, ConcurrentLinkedQueue<PatchData>> patchQueues = new ConcurrentHashMap<>();
 
-    private static final PriorityBlockingQueue<TileStruct> dirtyTileQueue = new PriorityBlockingQueue<TileStruct>(16, Comparator.comparingInt(TileStruct::getLevel));
+    private static final PriorityBlockingQueue<TileStruct> dirtyTileQueue = new PriorityBlockingQueue<>(16, Comparator.comparingInt(TileStruct::getLevel));
     public static final ConcurrentHashMap<TileStruct, Semaphore> writeLocks = new ConcurrentHashMap<>();
     public static final ConcurrentHashMap<TileStruct, Semaphore> readLocks = new ConcurrentHashMap<>();
 
@@ -90,9 +87,9 @@ public class TileWorker implements Runnable {
             FileManager.patchFile( //TODO: make an applyPatchesOnFile method that can apply multiple patches at once
                     t.getX(),
                     t.getY(),
-                    patch.getImage(),
-                    patch.getOffsetXPx(),
-                    patch.getOffsetYPx()
+                    patch.image(),
+                    patch.offsetXPx(),
+                    patch.offsetYPx()
             );
         }
     }
@@ -102,7 +99,7 @@ public class TileWorker implements Runnable {
         logger.debug("regenerating {} from children {}", t, children);
         children.forEach(c -> {
             try {
-                readLocks.computeIfAbsent(c, e -> new Semaphore(1));
+                readLocks.computeIfAbsent(c, _ -> new Semaphore(1));
                 readLocks.get(c).acquire();
                 logger.debug("{} locking child {}", t, c);
             } catch (InterruptedException e) {
@@ -121,14 +118,14 @@ public class TileWorker implements Runnable {
     }
 
     public static void addToPatchQueue(TileStruct tile, PatchData patchData) {
-        ConcurrentLinkedQueue<PatchData> patchQueue = TileWorker.patchQueues.computeIfAbsent(tile, k -> new ConcurrentLinkedQueue<>());
+        ConcurrentLinkedQueue<PatchData> patchQueue = TileWorker.patchQueues.computeIfAbsent(tile, _ -> new ConcurrentLinkedQueue<>());
         patchQueue.add(patchData);
         addToDirtyTileQueue(tile);
     }
 
     protected static void addToDirtyTileQueue(TileStruct tile) {
-        writeLocks.computeIfAbsent(tile, k -> new Semaphore(1));
-        readLocks.computeIfAbsent(tile, k -> new Semaphore(1));
+        writeLocks.computeIfAbsent(tile, _ -> new Semaphore(1));
+        readLocks.computeIfAbsent(tile, _ -> new Semaphore(1));
         if (!dirtyTileQueue.contains(tile)) {
             dirtyTileQueue.add(tile);
         }

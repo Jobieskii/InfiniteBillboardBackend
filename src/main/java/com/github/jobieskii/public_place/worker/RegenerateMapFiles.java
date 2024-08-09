@@ -11,14 +11,11 @@ import java.util.stream.Collectors;
 public class RegenerateMapFiles {
     static Logger logger = LoggerFactory.getLogger(RegenerateMapFiles.class);
 
-    public static Set<Tile> dirtyTiles = Collections.synchronizedSet(new HashSet<>());
-
-
     public static void RegenerateUpFromTilesList(List<Tile> tiles) {
         Set<Tile> set = tiles.stream()
                 .map(Tile::getParent)
                 .filter(Objects::nonNull)
-                .collect(Collectors.toSet());;
+                .collect(Collectors.toSet());
         while(!set.isEmpty()) {
             Set<Tile> parents = set.stream()
                 .map(Tile::getParent)

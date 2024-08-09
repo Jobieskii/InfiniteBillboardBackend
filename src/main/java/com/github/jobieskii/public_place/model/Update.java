@@ -1,9 +1,11 @@
 package com.github.jobieskii.public_place.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 
 import java.time.OffsetDateTime;
 
+@Getter
 @Entity
 @Table(name = "updates")
 public class Update {
@@ -23,22 +25,6 @@ public class Update {
     })
     private Tile tile;
 
-    public Long getId() {
-        return id;
-    }
-
-    public OffsetDateTime getDatetime() {
-        return datetime;
-    }
-
-    public String getIp() {
-        return ip;
-    }
-
-    public Tile getTile() {
-        return tile;
-    }
-
     public Update(Long id, OffsetDateTime datetime, String ip, Tile tile) {
         this.id = id;
         this.datetime = datetime;
@@ -47,7 +33,7 @@ public class Update {
     }
 
     public Update() {
-        this.id = 0l;
+        this.id = 0L;
         this.datetime = OffsetDateTime.now();
         this.ip = "";
         this.tile = null;

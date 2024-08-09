@@ -1,9 +1,11 @@
 package com.github.jobieskii.public_place.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 
 import java.util.Set;
 
+@Getter
 @Entity
 @IdClass(TileId.class)
 @Table(name = "tiles")
@@ -39,23 +41,6 @@ public class Tile {
         this.level = 0;
         this.parent = null;
     }
-
-    public int getX() {
-        return x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    public int getLevel() {
-        return level;
-    }
-
-    public Tile getParent() {
-        return parent;
-    }
-    public Set<Tile> getChildren() {return children;}
 
     @Override
     public String toString() {

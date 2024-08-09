@@ -1,14 +1,15 @@
 package com.github.jobieskii.public_place.model;
 
-import jakarta.persistence.Embeddable;
+import lombok.Getter;
 
 import java.io.Serializable;
 import java.util.Objects;
 
+@Getter
 public class TileId implements Serializable {
-    private int x;
-    private int y;
-    private int level;
+    private final int x;
+    private final int y;
+    private final int level;
     public TileId(int x, int y, int level) {
         this.x = x;
         this.y = y;
@@ -27,18 +28,6 @@ public class TileId implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         TileId tileId = (TileId) o;
         return x == tileId.x && y == tileId.y && level == tileId.level;
-    }
-
-    public int getLevel() {
-        return level;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    public int getX() {
-        return x;
     }
 
     @Override

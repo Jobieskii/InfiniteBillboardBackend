@@ -13,13 +13,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 
 @RestController
@@ -45,9 +42,6 @@ public class TileController {
         if (width >= 1024 || height >= 1024) {
             return ResponseEntity.badRequest().build();
         }
-
-        int x = xPx - xPx % TILE_SIZE;
-        int y = yPx - yPx % TILE_SIZE;
 
         List<Pair<Tile, PatchData>> tobePatched = new ArrayList<>();
 
@@ -95,12 +89,12 @@ public class TileController {
         return arr;
     }
 
-    private Tile ExpandTilesFor(int x, int y, int maxLevel) {
+    private void ExpandTilesFor(int x, int y, int maxLevel) {
 
-        return ExpandTilesForInner(x, y, maxLevel, 1);
+        ExpandTilesForInner(x, y, maxLevel, 1);
     }
-    private Tile ExpandTilesForInner(int x, int y, int maxLevel, int level) {
-        if (level > maxLevel) {return null;}
+    private void ExpandTilesForInner(int x, int y, int maxLevel, int level) {
+        if (level > maxLevel) {return;}
 
         Tile parrentT = tileRepository.findFirstByXAndYAndLevel(x/2, y/2, level + 1);
         if (parrentT == null) {
@@ -110,6 +104,5 @@ public class TileController {
         Tile newT = new Tile(x, y, level, parrentT);
         FileManager.createFile(level, x, y);
         tileRepository.save(newT);
-        return newT;
     }
 }
