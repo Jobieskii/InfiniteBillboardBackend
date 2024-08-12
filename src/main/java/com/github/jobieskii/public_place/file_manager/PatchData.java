@@ -4,7 +4,6 @@ import lombok.Getter;
 
 import java.awt.image.BufferedImage;
 
-@Getter
 public record PatchData(BufferedImage image, int offsetXPx, int offsetYPx) {
 
 }

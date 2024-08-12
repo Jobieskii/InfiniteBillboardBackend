@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-
+@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600)
 @RestController
 @RequestMapping("/tiles")
 public class TileController {
@@ -32,7 +32,7 @@ public class TileController {
     }
 
     @PatchMapping("{xPx}/{yPx}")
-    public ResponseEntity patchTiles(@PathVariable int xPx, @PathVariable int yPx, @RequestParam("image") MultipartFile file, @RequestParam("scale") Float scale) throws IOException {
+    public ResponseEntity patchTiles(@PathVariable int xPx, @PathVariable int yPx, @RequestPart("image") MultipartFile file, @RequestParam("scale") Float scale) throws IOException {
         if (scale == null) {
             scale = 1.0f;
         }
