@@ -46,25 +46,33 @@ public class TileController {
         List<Pair<Tile, PatchData>> tobePatched = new ArrayList<>();
 
         int widthSoFar = 0;
-        for (int i = xPx / TILE_SIZE; i <= (xPx + width) / TILE_SIZE; i++) {
+        for (int i = Math.floorDiv(xPx, TILE_SIZE); i <= Math.floorDiv((xPx + width), TILE_SIZE); i++) {
 
             int dx = 0;
             if (xPx > i*TILE_SIZE) {
                 dx = xPx %TILE_SIZE;
+                if (dx < 0)
+                {
+                    dx += TILE_SIZE;
+                }
             }
             int dw = TILE_SIZE - dx;
-            if (dx + width - widthSoFar < TILE_SIZE) {
+            if (dx + width - widthSoFar <= TILE_SIZE) {
                 dw = width - widthSoFar;
             }
 
             int heightSoFar = 0;
-            for (int j = yPx / TILE_SIZE; j <= (yPx + height) / TILE_SIZE; j++) {
+            for (int j = Math.floorDiv(yPx, TILE_SIZE); j <= Math.floorDiv((yPx + height), TILE_SIZE); j++) {
                 int dy = 0;
                 if (yPx > j*TILE_SIZE) {
                     dy = yPx %TILE_SIZE;
+                    if (dy < 0)
+                    {
+                        dy += TILE_SIZE;
+                    }
                 }
                 int dh = TILE_SIZE - dy;
-                if (dy + height - heightSoFar < TILE_SIZE) {
+                if (dy + height - heightSoFar <= TILE_SIZE) {
                     dh = height - heightSoFar;
                 }
                 Tile t = tileRepository.findFirstByXAndYAndLevel(i, j, 1);
@@ -96,10 +104,10 @@ public class TileController {
     private void ExpandTilesForInner(int x, int y, int maxLevel, int level) {
         if (level > maxLevel) {return;}
 
-        Tile parrentT = tileRepository.findFirstByXAndYAndLevel(x/2, y/2, level + 1);
+        Tile parrentT = tileRepository.findFirstByXAndYAndLevel(Math.floorDiv(x,2), Math.floorDiv(y,2), level + 1);
         if (parrentT == null) {
-            ExpandTilesForInner(x/2, y/2, maxLevel, level+1);
-            parrentT = tileRepository.findFirstByXAndYAndLevel(x/2, y/2, level + 1);
+            ExpandTilesForInner(Math.floorDiv(x,2), Math.floorDiv(y,2), maxLevel, level+1);
+            parrentT = tileRepository.findFirstByXAndYAndLevel(Math.floorDiv(x,2), Math.floorDiv(y,2), level + 1);
         }
         Tile newT = new Tile(x, y, level, parrentT);
         FileManager.createFile(level, x, y);

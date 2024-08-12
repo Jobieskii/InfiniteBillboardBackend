@@ -53,7 +53,7 @@ public class TileStruct {
         if (level > 2) {
             return null;
         }
-        return new TileStruct(this.x / 2, this.y / 2, this.level + 1);
+        return new TileStruct(Math.floorDiv(this.x, 2), Math.floorDiv(this.y, 2), this.level + 1);
     }
     public List<TileStruct> getChildren() {
         List<TileStruct> children = new ArrayList<>();
