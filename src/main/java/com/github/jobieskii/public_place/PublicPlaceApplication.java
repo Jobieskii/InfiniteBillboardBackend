@@ -6,10 +6,12 @@ import com.github.jobieskii.public_place.worker.RegenerateMapFiles;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.util.List;
 
 @SpringBootApplication
+@EnableScheduling
 public class PublicPlaceApplication implements CommandLineRunner {
 
 	private final TileRepository tileRepository;

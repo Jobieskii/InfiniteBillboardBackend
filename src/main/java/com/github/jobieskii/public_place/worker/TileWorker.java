@@ -67,6 +67,8 @@ public class TileWorker implements Runnable {
             }
             if (t.getLevel() == 1) {
                 applyPatches(t);
+                ScheduledStompRefreshList.putDirtyClientTile(t);
+
             } else {
                 regenerateFromChildren(t);
             }
