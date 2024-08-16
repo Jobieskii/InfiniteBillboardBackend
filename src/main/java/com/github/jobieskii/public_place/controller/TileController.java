@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -39,10 +40,17 @@ public class TileController {
         BufferedImage image = ImageIO.read(file.getInputStream());
         int width = (int) (image.getWidth() * scale);
         int height = (int) (image.getHeight() * scale);
-        if (width >= 1024 || height >= 1024) {
+        if (width > 1024 || height > 1024 || image.getWidth() > 10240 || image.getHeight() > 10240 || file.getSize() > 10 * 1024 * 1024 ) {
             return ResponseEntity.badRequest().build();
         }
+        if (scale != 1.0f) {
+            BufferedImage scaledImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g = scaledImage.createGraphics();
+            g.drawImage(image, 0, 0, width, height, null);
+            g.dispose();
 
+            image = scaledImage;
+        }
         List<Pair<Tile, PatchData>> tobePatched = new ArrayList<>();
 
         int widthSoFar = 0;
