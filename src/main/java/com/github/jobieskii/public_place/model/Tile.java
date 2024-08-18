@@ -1,5 +1,6 @@
 package com.github.jobieskii.public_place.model;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.Getter;
 
@@ -17,6 +18,9 @@ public class Tile {
     @Id
     private int level;
 
+    @Nullable
+    private Integer protectedFor;
+
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "parent_x", referencedColumnName = "x"),
@@ -25,14 +29,15 @@ public class Tile {
     })
     private Tile parent;
 
-    @OneToMany(mappedBy = "parent", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY)
     private Set<Tile> children;
 
-    public Tile(int x, int y, int level, Tile parent) {
+    public Tile(int x, int y, int level, Tile parent, Integer protectedFor) {
         this.x = x;
         this.y = y;
         this.level = level;
         this.parent = parent;
+        this.protectedFor = protectedFor;
     }
 
     public Tile() {
@@ -40,6 +45,7 @@ public class Tile {
         this.y = 0;
         this.level = 0;
         this.parent = null;
+        protectedFor = null;
     }
 
     @Override
@@ -48,6 +54,7 @@ public class Tile {
                 "level=" + level +
                 ", x=" + x +
                 ", y=" + y +
+                ", protected=" + (protectedFor != null) +
                 '}';
     }
 }

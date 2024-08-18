@@ -15,7 +15,7 @@ public class Update {
 
     private OffsetDateTime datetime;
 
-    private String ip;
+    private int userId;
 
     @ManyToOne
     @JoinColumns({
@@ -25,17 +25,17 @@ public class Update {
     })
     private Tile tile;
 
-    public Update(Long id, OffsetDateTime datetime, String ip, Tile tile) {
+    public Update(Long id, OffsetDateTime datetime, Tile tile, int userId) {
         this.id = id;
         this.datetime = datetime;
-        this.ip = ip;
+        this.userId = userId;
         this.tile = tile;
     }
 
     public Update() {
         this.id = 0L;
         this.datetime = OffsetDateTime.now();
-        this.ip = "";
         this.tile = null;
+        this.userId = -1;
     }
 }

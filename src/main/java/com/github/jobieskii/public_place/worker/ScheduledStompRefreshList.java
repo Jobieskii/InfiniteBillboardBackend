@@ -16,7 +16,7 @@ public class ScheduledStompRefreshList {
 
     public static final Set<TileStruct> synchronizedDirtyClientTilesSet = Collections.synchronizedSet(new HashSet<>());
 
-    private SimpMessagingTemplate template;
+    private final SimpMessagingTemplate template;
 
     @Autowired
     public ScheduledStompRefreshList(SimpMessagingTemplate template) {
