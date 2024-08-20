@@ -25,11 +25,13 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.github.jobieskii.public_place.PublicPlaceApplication.MAX_LEVEL;
+import static com.github.jobieskii.public_place.PublicPlaceApplication.TILE_SIZE;
+
 @CrossOrigin(origins = "https://bib.localhost.com", maxAge = 3600, allowCredentials = "true", methods = {RequestMethod.GET, RequestMethod.PATCH})
 @RestController
 @RequestMapping("/")
 public class TileController {
-    public static final int TILE_SIZE = 512;
     public static final int LIMIT_IDX = 500000/TILE_SIZE;
     private final TileRepository tileRepository;
     private final UpdateRepository updateRepository;
@@ -123,7 +125,7 @@ public class TileController {
                 }
                 Tile t = tileRepository.findFirstByXAndYAndLevel(i, j, 1);
                 if (t == null) {
-                    this.ExpandTilesFor(i, j, 3);
+                    ExpandTilesFor(i, j, MAX_LEVEL, tileRepository, null);
                     t = tileRepository.findFirstByXAndYAndLevel(i, j, 1);
                 }
                 if (t.getProtectedFor() == null &&
@@ -155,22 +157,22 @@ public class TileController {
         return arr;
     }
 
-    private void ExpandTilesFor(int x, int y, int maxLevel) {
+    public static void ExpandTilesFor(int x, int y, int maxLevel, TileRepository tileRepository, Integer protectFor) {
 
-        ExpandTilesForInner(x, y, maxLevel, 1);
+        ExpandTilesForInner(x, y, maxLevel, 1, tileRepository, protectFor);
     }
 
-    private void ExpandTilesForInner(int x, int y, int maxLevel, int level) {
+    private static void ExpandTilesForInner(int x, int y, int maxLevel, int level, TileRepository tileRepository, Integer protectFor) {
         if (level > maxLevel) {
             return;
         }
 
         Tile parrentT = tileRepository.findFirstByXAndYAndLevel(Math.floorDiv(x, 2), Math.floorDiv(y, 2), level + 1);
         if (parrentT == null) {
-            ExpandTilesForInner(Math.floorDiv(x, 2), Math.floorDiv(y, 2), maxLevel, level + 1);
+            ExpandTilesForInner(Math.floorDiv(x, 2), Math.floorDiv(y, 2), maxLevel, level + 1, tileRepository, protectFor);
             parrentT = tileRepository.findFirstByXAndYAndLevel(Math.floorDiv(x, 2), Math.floorDiv(y, 2), level + 1);
         }
-        Tile newT = new Tile(x, y, level, parrentT, null);
+        Tile newT = new Tile(x, y, level, parrentT, protectFor);
         FileManager.createFile(level, x, y);
         tileRepository.save(newT);
     }

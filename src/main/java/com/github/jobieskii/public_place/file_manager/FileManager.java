@@ -9,6 +9,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
+import static com.github.jobieskii.public_place.PublicPlaceApplication.TILE_SIZE;
+
 public class FileManager {
 
     static Logger logger = LoggerFactory.getLogger(FileManager.class);
@@ -26,8 +28,8 @@ public class FileManager {
                     boolean b = parentDir.mkdirs();
                     if (!b) throw new IOException("Unable to create directory " + parentDir);
                 }
-                int width = 512;
-                int height = 512;
+                int width = TILE_SIZE;
+                int height = TILE_SIZE;
                 BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
                 Graphics2D g2d = image.createGraphics();
                 g2d.setColor(Color.WHITE); // set the color to white
@@ -77,25 +79,25 @@ public class FileManager {
             if (!b) throw new IOException("Unable to create directory " + parentDir);
         }
 
-        BufferedImage newImage = new BufferedImage(1024, 1024, BufferedImage.TYPE_INT_RGB);
+        BufferedImage newImage = new BufferedImage(TILE_SIZE*2, TILE_SIZE*2, BufferedImage.TYPE_INT_RGB);
         Graphics2D g2d = newImage.createGraphics();
         for (int cx = x*2; cx <= x*2 + 1; cx += 1) {
             for (int cy = y*2; cy <= y*2 + 1; cy += 1) {
                 File lowerFile = new File(String.format("%s/%d/%d/%d.png", path, level-1, cx, cy));
                 if (lowerFile.exists()) {
-                    g2d.drawImage(ImageIO.read(lowerFile), (cx-x*2)*512, (cy-y*2)*512, null);
+                    g2d.drawImage(ImageIO.read(lowerFile), (cx-x*2)*TILE_SIZE, (cy-y*2)*TILE_SIZE, null);
                 } else {
                     g2d.setColor(Color.WHITE);
-                    g2d.fillRect( (cx-x*2)*512, (cy-y*2)*512, 512, 512);
+                    g2d.fillRect( (cx-x*2)*TILE_SIZE, (cy-y*2)*TILE_SIZE, TILE_SIZE, TILE_SIZE);
                     logger.info("File for {}/{}/{} doesn't exist", level-1, cx, cy);
                 }
             }
         }
         g2d.dispose();
 
-        BufferedImage scaledImage = new BufferedImage(512, 512, BufferedImage.TYPE_INT_RGB);
+        BufferedImage scaledImage = new BufferedImage(TILE_SIZE, TILE_SIZE, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = scaledImage.createGraphics();
-        g.drawImage(newImage, 0, 0, 512, 512, null);
+        g.drawImage(newImage, 0, 0, TILE_SIZE, TILE_SIZE, null);
         g.dispose();
 
         ImageIO.write(scaledImage, "png", file);

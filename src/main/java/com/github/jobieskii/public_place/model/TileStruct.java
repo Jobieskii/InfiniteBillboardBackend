@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static com.github.jobieskii.public_place.PublicPlaceApplication.MAX_LEVEL;
+
 /*
 This class is used only for calculations, Use Tile whenever persistence to the DB is required
  */
@@ -50,7 +52,7 @@ public class TileStruct {
     }
 
     public TileStruct getParent() {
-        if (level > 2) {
+        if (level >= MAX_LEVEL) {
             return null;
         }
         return new TileStruct(Math.floorDiv(this.x, 2), Math.floorDiv(this.y, 2), this.level + 1);
