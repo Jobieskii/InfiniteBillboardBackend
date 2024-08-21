@@ -28,7 +28,7 @@ import java.util.List;
 import static com.github.jobieskii.public_place.PublicPlaceApplication.MAX_LEVEL;
 import static com.github.jobieskii.public_place.PublicPlaceApplication.TILE_SIZE;
 
-@CrossOrigin(origins = "https://bib.localhost.com", maxAge = 3600, allowCredentials = "true", methods = {RequestMethod.GET, RequestMethod.PATCH})
+//@CrossOrigin(origins = "https://bib.bohenek.xyz", maxAge = 3600, allowCredentials = "true", methods = {RequestMethod.GET, RequestMethod.PATCH})
 @RestController
 @RequestMapping("/")
 public class TileController {
@@ -148,13 +148,6 @@ public class TileController {
         });
 
         return ResponseEntity.ok().build();
-    }
-
-    @GetMapping("tiles") //TODO: remove this or protect
-    public List<Tile> getTiles() {
-        ArrayList<Tile> arr = new ArrayList<>();
-        tileRepository.findAll().forEach(arr::add);
-        return arr;
     }
 
     public static void ExpandTilesFor(int x, int y, int maxLevel, TileRepository tileRepository, Integer protectFor) {

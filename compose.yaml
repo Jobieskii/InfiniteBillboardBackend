@@ -7,3 +7,17 @@ services:
       - 'POSTGRES_USER=myuser'
     ports:
       - '5432:5432'
+  spring:
+    build: .
+    volumes:
+      - mapfiles-vol:/mount:rw
+    environment:
+      - 'AUTH_ENDPOINT=http://localhost.com/api/check_session'
+      - 'TILEWORKER_THREADS=4'
+      - 'MAPFILES_PATH=/mount/mapfiles'
+      - 'spring.datasource.url=jdbc:postgresql://postgres:5432/mydatabase'
+    ports: 
+      - '8080:8080'
+    command: ''
+volumes:
+  mapfiles-vol:

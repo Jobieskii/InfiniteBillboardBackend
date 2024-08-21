@@ -2,6 +2,7 @@ package com.github.jobieskii.public_place.file_manager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -15,7 +16,8 @@ public class FileManager {
 
     static Logger logger = LoggerFactory.getLogger(FileManager.class);
 
-    public static String path = System.getProperty("user.dir") + "/mapfiles";
+
+    private static String path = System.getenv("MAPFILES_PATH");
 
     public static void createFile(int level, int x, int y) {
         String filePath = String.format("%s/%d/%d/%d.png", path, level, x, y);

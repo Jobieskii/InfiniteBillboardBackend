@@ -8,10 +8,13 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Value;
 
 @Component
 public class ThreadPoolConfig {
 
+    @Value("${TILEWORKER_THREADS:1}")
+    private Integer tileworkerThreads;
 
     private final List<TileWorker> workers = new ArrayList<>();
     private final List<Thread> threads = new ArrayList<>();
@@ -19,7 +22,7 @@ public class ThreadPoolConfig {
     @PostConstruct
     public void startWorkers() {
         // Number of threads you want to run
-        int numberOfThreads = 5;
+        int numberOfThreads = tileworkerThreads;
 
         for (int i = 0; i < numberOfThreads; i++) {
             TileWorker worker = new TileWorker();
