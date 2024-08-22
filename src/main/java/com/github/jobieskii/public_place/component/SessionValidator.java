@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SessionValidator {
     static Logger logger = LoggerFactory.getLogger(SessionValidator.class);
 
-    @Value("${AUTH_ENDPOINT:http://localhost}")
+    @Value("${AUTH_ENDPOINT:}")
     private String authEndpoint;
 
     public SessionValidator() {
@@ -33,6 +33,10 @@ public class SessionValidator {
     private final Map<String, UserData> sessions = new ConcurrentHashMap<>();
 
     public UserData checkSession(String sessionId) {
+        if (authEndpoint.isEmpty()) {
+            return new UserData("anonymous", -1);
+        }
+
         if (sessions.containsKey(sessionId)) {
             return sessions.get(sessionId);
         }

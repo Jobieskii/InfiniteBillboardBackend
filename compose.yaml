@@ -7,17 +7,27 @@ services:
       - 'POSTGRES_USER=myuser'
     ports:
       - '5432:5432'
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U myuser -d mydatabase"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
   spring:
     build: .
     volumes:
       - mapfiles-vol:/mount:rw
     environment:
-      - 'AUTH_ENDPOINT=http://localhost.com/api/check_session'
+      - 'AUTH_ENDPOINT=https://localhost.com/api/check_session'
+      - 'ORIGIN=https://bib.localhost.com'
       - 'TILEWORKER_THREADS=4'
       - 'MAPFILES_PATH=/mount/mapfiles'
       - 'spring.datasource.url=jdbc:postgresql://postgres:5432/mydatabase'
-    ports: 
+    ports:
       - '8080:8080'
     command: ''
+    depends_on:
+      postgres:
+        condition: "service_healthy"
 volumes:
   mapfiles-vol:
