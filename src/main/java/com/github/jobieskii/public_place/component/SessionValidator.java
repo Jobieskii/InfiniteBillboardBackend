@@ -36,6 +36,9 @@ public class SessionValidator {
         if (authEndpoint.isEmpty()) {
             return new UserData("anonymous", -1);
         }
+        if (sessionId == null) {
+            return null;
+        }
 
         if (sessions.containsKey(sessionId)) {
             return sessions.get(sessionId);

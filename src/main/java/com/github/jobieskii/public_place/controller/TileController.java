@@ -10,6 +10,8 @@ import com.github.jobieskii.public_place.model.Update;
 import com.github.jobieskii.public_place.repository.TileRepository;
 import com.github.jobieskii.public_place.repository.UpdateRepository;
 import com.github.jobieskii.public_place.worker.TileWorker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +39,7 @@ public class TileController {
     private final UpdateRepository updateRepository;
     private final SessionValidator sessionValidator;
     private final UserRateLimiter userRateLimiter;
+    static Logger logger = LoggerFactory.getLogger(TileController.class);
 
     public TileController(TileRepository tileRepository, UpdateRepository updateRepository, SessionValidator sessionValidator, UserRateLimiter userRateLimiter) {
         this.tileRepository = tileRepository;
@@ -64,10 +67,7 @@ public class TileController {
             @RequestPart("image") MultipartFile file,
             @RequestParam("scale") Float scale,
             @Nullable @CookieValue("sessionid") String sessionid
-    ) throws IOException {
-        if (sessionid == null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
+    ) {
         SessionValidator.UserData user = sessionValidator.checkSession(sessionid);
         if (user == null) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
@@ -79,7 +79,17 @@ public class TileController {
         if (scale == null) {
             scale = 1.0f;
         }
-        BufferedImage image = ImageIO.read(file.getInputStream());
+        BufferedImage image;
+        try {
+            image = ImageIO.read(file.getInputStream());
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+        if (image == null) {
+            logger.warn("ImageIO failed to read image stream. Content type: %s name: %s".formatted(file.getContentType(), file.getName()));
+            return ResponseEntity.badRequest().build();
+        }
         int width = (int) (image.getWidth() * scale);
         int height = (int) (image.getHeight() * scale);
         if (width > 1024 || height > 1024 || image.getWidth() > 10240 || image.getHeight() > 10240 || file.getSize() > 10 * 1024 * 1024) {
