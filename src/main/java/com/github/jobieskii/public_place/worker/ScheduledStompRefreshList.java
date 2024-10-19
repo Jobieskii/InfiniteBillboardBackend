@@ -8,6 +8,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.OffsetDateTime;
 import java.util.*;
 
 @Service
@@ -18,26 +19,34 @@ public class ScheduledStompRefreshList {
 
     private final SimpMessagingTemplate template;
 
+    private OffsetDateTime lastRefresh;
+
     @Autowired
     public ScheduledStompRefreshList(SimpMessagingTemplate template) {
         this.template = template;
     }
 
-    @Scheduled(fixedRate = 1000)
+    @Scheduled(fixedRate = 500)
     public void sendMessage() {
         synchronized (synchronizedDirtyClientTilesSet) {
             if (!synchronizedDirtyClientTilesSet.isEmpty()) {
-                List<String> updates = synchronizedDirtyClientTilesSet.stream()
-                        .filter(e -> e.getLevel()==1)
-                        .map(e -> "%d/%d".formatted(e.getX(), e.getY()))
-                        .toList();
+                // aggregate updates if there's still work in the queue -- fixes issue with multiple refreshes on the browser
+                if (TileWorker.dirtyTileQueueLength() == 0 || (lastRefresh != null && lastRefresh.isBefore(OffsetDateTime.now().minusSeconds(3)))) {
+                    List<String> updates = synchronizedDirtyClientTilesSet.stream()
+                            .filter(e -> e.getLevel()==1)
+                            .map(e -> "%d/%d".formatted(e.getX(), e.getY()))
+                            .toList();
 
-                logger.info("Sending list of {} updates to /topic/tile-updates", updates.size());
+                    logger.info("Sending list of {} updates to /topic/tile-updates", updates.size());
 
-                template.convertAndSend(
-                        "/topic/tile-updates", updates
-                );
-                synchronizedDirtyClientTilesSet.clear();
+                    template.convertAndSend(
+                            "/topic/tile-updates", updates
+                    );
+                    synchronizedDirtyClientTilesSet.clear();
+                    lastRefresh = OffsetDateTime.now();
+                } else {
+                    logger.info("Waiting on workers (done {} / todo {})", synchronizedDirtyClientTilesSet.size(), TileWorker.dirtyTileQueueLength());
+                }
             }
         }
 

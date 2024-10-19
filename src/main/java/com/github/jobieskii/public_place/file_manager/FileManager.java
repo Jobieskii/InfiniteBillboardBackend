@@ -99,6 +99,9 @@ public class FileManager {
 
         BufferedImage scaledImage = new BufferedImage(TILE_SIZE, TILE_SIZE, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = scaledImage.createGraphics();
+        g.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_SPEED);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RenderingHints.VALUE_INTERPOLATION_BICUBIC);
         g.drawImage(newImage, 0, 0, TILE_SIZE, TILE_SIZE, null);
         g.dispose();
 

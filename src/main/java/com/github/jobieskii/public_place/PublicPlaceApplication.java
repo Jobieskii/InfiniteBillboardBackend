@@ -53,7 +53,7 @@ public class PublicPlaceApplication implements CommandLineRunner {
 				}
 			}
 			List<Tile> tiles = tileRepository.findByLevel(1);
-			RegenerateMapFiles.RegenerateUpFromTilesList(tiles);
+			RegenerateMapFiles.RegenerateUpFromTilesList(tiles, tileRepository);
 		}
 	}
 	private static final String[] FORMATS = {"jpeg", "png", "webp", "gif", "tiff", "bmp"};

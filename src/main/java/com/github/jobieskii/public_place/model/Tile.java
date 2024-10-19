@@ -3,6 +3,7 @@ package com.github.jobieskii.public_place.model;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Set;
 
@@ -21,6 +22,7 @@ public class Tile {
     @Nullable
     private Integer protectedFor;
 
+    @Setter
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "parent_x", referencedColumnName = "x"),

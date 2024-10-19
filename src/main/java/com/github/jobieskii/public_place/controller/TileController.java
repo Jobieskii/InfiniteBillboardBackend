@@ -98,6 +98,9 @@ public class TileController {
         if (scale != 1.0f) {
             BufferedImage scaledImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g = scaledImage.createGraphics();
+            g.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_DEFAULT);
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RenderingHints.VALUE_INTERPOLATION_BICUBIC);
             g.drawImage(image, 0, 0, width, height, null);
             g.dispose();
 
@@ -140,7 +143,8 @@ public class TileController {
                 }
                 if (t.getProtectedFor() == null &&
                     i <= LIMIT_IDX && i >= -LIMIT_IDX &&
-                    j <= LIMIT_IDX && j >= -LIMIT_IDX
+                    j <= LIMIT_IDX && j >= -LIMIT_IDX &&
+                    dw != 0 && dh != 0
                 ) {
                     tobePatched.add(Pair.of(t, new PatchData(image.getSubimage(widthSoFar, heightSoFar, dw, dh), dx, dy)));
                 }
@@ -149,11 +153,13 @@ public class TileController {
             }
             widthSoFar += dw;
         }
+
+        OffsetDateTime now = OffsetDateTime.now();
         if (tobePatched.isEmpty()) {
             return ResponseEntity.status(HttpStatus.LOCKED).build();
         } else tobePatched.forEach(e -> {
             TileWorker.addToPatchQueue(new TileStruct(e.getFirst()), e.getSecond());
-            Update u = new Update(null, OffsetDateTime.now(), e.getFirst(), user.id());
+            Update u = new Update(null, now, e.getFirst(), user.id());
             updateRepository.save(u);
         });
 

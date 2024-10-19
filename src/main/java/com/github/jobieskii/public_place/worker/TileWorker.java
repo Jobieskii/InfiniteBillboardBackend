@@ -125,6 +125,10 @@ public class TileWorker implements Runnable {
         addToDirtyTileQueue(tile);
     }
 
+    public static int dirtyTileQueueLength() {
+        return dirtyTileQueue.size();
+    }
+
     protected static void addToDirtyTileQueue(TileStruct tile) {
         writeLocks.computeIfAbsent(tile, _ -> new Semaphore(1));
         readLocks.computeIfAbsent(tile, _ -> new Semaphore(1));
