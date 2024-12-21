@@ -16,6 +16,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -61,16 +62,19 @@ public class RegenerateMapFiles {
             });
         }
 
+        AtomicInteger sumRegenerated = new AtomicInteger();
         for (int i = 2; i <= MAX_LEVEL; i++) {
             logger.info("Regenerating tiles at level {}", i);
             tileRepository.findByLevel(i).forEach(tile -> {
                 try {
                     FileManager.regenerateFromLowerLevel(tile.getLevel(), tile.getX(), tile.getY());
+                    sumRegenerated.incrementAndGet();
                 } catch (Exception e) {
                     logger.error(e.getMessage());
                 }
             });
         }
+        logger.info("Regenerated {} tiles", sumRegenerated);
     }
 
     private static void regenerateParentTileInDb(int x, int y, int level, TileRepository tileRepository) {

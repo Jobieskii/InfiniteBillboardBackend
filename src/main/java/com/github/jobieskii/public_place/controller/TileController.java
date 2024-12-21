@@ -34,7 +34,7 @@ import static com.github.jobieskii.public_place.PublicPlaceApplication.TILE_SIZE
 @RestController
 @RequestMapping("/")
 public class TileController {
-    public static final int LIMIT_IDX = 500000/TILE_SIZE;
+    public static final int LIMIT_IDX = 5_000_000/TILE_SIZE;
     private final TileRepository tileRepository;
     private final UpdateRepository updateRepository;
     private final SessionValidator sessionValidator;
@@ -50,9 +50,6 @@ public class TileController {
 
     @GetMapping("session")
     public ResponseEntity getSessionStatus(@Nullable @CookieValue("sessionid") String sessionid) {
-        if (sessionid == null) {
-            return ResponseEntity.badRequest().build();
-        }
         SessionValidator.UserData user = sessionValidator.checkSession(sessionid);
         if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
