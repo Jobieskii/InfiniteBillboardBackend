@@ -2,7 +2,6 @@ package com.github.jobieskii.public_place.file_manager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -17,10 +16,10 @@ public class FileManager {
     static Logger logger = LoggerFactory.getLogger(FileManager.class);
 
 
-    private static String path = System.getenv("MAPFILES_PATH");
+    public static final String mapfiles_path = System.getenv("MAPFILES_PATH");
 
     public static void createFile(int level, int x, int y) {
-        String filePath = String.format("%s/%d/%d/%d.png", path, level, x, y);
+        String filePath = String.format("%s/%d/%d/%d.png", mapfiles_path, level, x, y);
         File file = new File(filePath);
 
         if (!file.exists()) {
@@ -50,7 +49,7 @@ public class FileManager {
     }
 
     public static void patchFile(int x, int y, BufferedImage image, int offsetXPx, int offsetYPx) {
-        String filePath = String.format("%s/%d/%d/%d.png", path, 1, x, y);
+        String filePath = String.format("%s/%d/%d/%d.png", mapfiles_path, 1, x, y);
         File file = new File(filePath);
 
         if (file.exists()) {
@@ -72,7 +71,7 @@ public class FileManager {
         if (level == 1) {
             throw new Exception("Can't regenerate for the lowest level");
         }
-        String filePath = String.format("%s/%d/%d/%d.png", path, level, x, y);
+        String filePath = String.format("%s/%d/%d/%d.png", mapfiles_path, level, x, y);
         File file = new File(filePath);
 
         File parentDir = file.getParentFile();
@@ -85,13 +84,13 @@ public class FileManager {
         Graphics2D g2d = newImage.createGraphics();
         for (int cx = x*2; cx <= x*2 + 1; cx += 1) {
             for (int cy = y*2; cy <= y*2 + 1; cy += 1) {
-                File lowerFile = new File(String.format("%s/%d/%d/%d.png", path, level-1, cx, cy));
+                File lowerFile = new File(String.format("%s/%d/%d/%d.png", mapfiles_path, level-1, cx, cy));
                 if (lowerFile.exists()) {
                     g2d.drawImage(ImageIO.read(lowerFile), (cx-x*2)*TILE_SIZE, (cy-y*2)*TILE_SIZE, null);
                 } else {
                     g2d.setColor(Color.WHITE);
                     g2d.fillRect( (cx-x*2)*TILE_SIZE, (cy-y*2)*TILE_SIZE, TILE_SIZE, TILE_SIZE);
-                    logger.info("File for {}/{}/{} doesn't exist", level-1, cx, cy);
+                    logger.debug("File for {}/{}/{} doesn't exist", level-1, cx, cy);
                 }
             }
         }
@@ -106,6 +105,6 @@ public class FileManager {
         g.dispose();
 
         ImageIO.write(scaledImage, "png", file);
-        logger.info("Regenerated file at {}/{}/{}", level, x, y);
+        logger.debug("Regenerated file at {}/{}/{}", level, x, y);
     }
 }

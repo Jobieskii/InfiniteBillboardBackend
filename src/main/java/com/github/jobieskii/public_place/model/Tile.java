@@ -23,7 +23,7 @@ public class Tile {
     private Integer protectedFor;
 
     @Setter
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
             @JoinColumn(name = "parent_x", referencedColumnName = "x"),
             @JoinColumn(name = "parent_y", referencedColumnName = "y"),

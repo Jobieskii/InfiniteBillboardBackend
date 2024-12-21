@@ -3,9 +3,7 @@ package com.github.jobieskii.public_place.component;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -28,7 +26,8 @@ public class SessionValidator {
     public SessionValidator() {
     }
 
-    public record UserData(String username, int id) {}
+    public record UserData(String username, int id) {
+    }
 
     private final Map<String, UserData> sessions = new ConcurrentHashMap<>();
 
@@ -50,13 +49,14 @@ public class SessionValidator {
         }
         return res;
     }
+
     UserData askAuthority(String sessionId) {
         URI uri = URI.create(authEndpoint);
         try {
             URL url = uri.toURL();
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
-            conn.setRequestProperty("Cookie", "sessionid="+sessionId);
+            conn.setRequestProperty("Cookie", "sessionid=" + sessionId);
 
             if (conn.getResponseCode() != 200) {
                 return null;
